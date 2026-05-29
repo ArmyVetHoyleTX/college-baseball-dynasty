@@ -4,27 +4,28 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Player } from "../models/player";
 import { Recruit, TransferPortalEntry } from "../models/game";
 import { generateRoster } from "../engine/playerFactory";
-import { SCHOOL_TEMPLATES } from "../data/schools";
 
 interface RosterStore {
-  players: Record<string, Player>;   // id → Player
+  // Only the user's school roster is stored — CPU rosters are generated on demand
+  players: Record<string, Player>;
   recruitPool: Recruit[];
   transferPortal: TransferPortalEntry[];
-  recruitingInterest: Record<string, number>;  // recruitId → points invested
-  transferInterest: Record<string, number>;    // playerId → points invested
+  recruitingInterest: Record<string, number>;
+  transferInterest: Record<string, number>;
 
   // Actions
-  initRosters: (season: number) => void;
+  initUserRoster: (schoolId: string, prestige: number, season: number) => void;
   updatePlayer: (player: Player) => void;
   addPlayer: (player: Player) => void;
   removePlayer: (playerId: string) => void;
-  getSchoolRoster: (schoolId: string) => Player[];
+  getUserRoster: () => Player[];
   setRecruitPool: (recruits: Recruit[]) => void;
   setTransferPortal: (entries: TransferPortalEntry[]) => void;
   investRecruitingPoints: (recruitId: string, points: number) => void;
   commitRecruit: (recruit: Recruit, schoolId: string) => void;
   commitTransfer: (entry: TransferPortalEntry, schoolId: string) => void;
   bulkUpdatePlayers: (players: Player[]) => void;
+  clearRoster: () => void;
 }
 
 export const useRosterStore = create<RosterStore>()(
@@ -36,14 +37,11 @@ export const useRosterStore = create<RosterStore>()(
       recruitingInterest: {},
       transferInterest: {},
 
-      initRosters: (season: number) => {
+      // Only generate + store the user's own roster
+      initUserRoster: (schoolId, prestige, season) => {
+        const roster = generateRoster(schoolId, prestige, season, prestige * season);
         const players: Record<string, Player> = {};
-        for (const school of SCHOOL_TEMPLATES) {
-          const roster = generateRoster(school.id, school.prestige, season, school.prestige * season);
-          for (const p of roster) {
-            players[p.id] = p;
-          }
-        }
+        for (const p of roster) players[p.id] = p;
         set({ players });
       },
 
@@ -62,9 +60,7 @@ export const useRosterStore = create<RosterStore>()(
         });
       },
 
-      getSchoolRoster: (schoolId) => {
-        return Object.values(get().players).filter((p) => p.schoolId === schoolId);
-      },
+      getUserRoster: () => Object.values(get().players),
 
       setRecruitPool: (recruits) => set({ recruitPool: recruits }),
 
@@ -79,8 +75,7 @@ export const useRosterStore = create<RosterStore>()(
         }));
       },
 
-      commitRecruit: (recruit, schoolId) => {
-        // Find a template to convert recruit to player
+      commitRecruit: (recruit, _schoolId) => {
         set((state) => ({
           recruitPool: state.recruitPool.filter((r) => r.id !== recruit.id),
         }));
@@ -107,9 +102,11 @@ export const useRosterStore = create<RosterStore>()(
           return { players: updated };
         });
       },
+
+      clearRoster: () => set({ players: {}, recruitPool: [], transferPortal: [] }),
     }),
     {
-      name: "cbd-roster-store-v1",
+      name: "cbd-roster-store-v2",
       storage: createJSONStorage(() => AsyncStorage),
     },
   ),
