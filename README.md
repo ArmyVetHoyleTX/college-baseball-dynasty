@@ -1,36 +1,35 @@
-# Adobe Fonts Liberator
+# College Baseball Dynasty
 
-> Copy Adobe Fonts (OTF) to a folder on your Desktop
+A mobile dynasty management game for college baseball — Android, iOS, and Web.
 
-[https://github.com/pawalan/adobe-fonts-liberator](https://github.com/pawalan/adobe-fonts-liberator)
+Built with React Native + Expo. Pick a D1 program, recruit players, manage NIL deals, sim games with a full batter vs. pitcher engine, and chase the College World Series title.
 
-### Problem  
-Your licensed and activated Adobe Fonts are not accessible for general use in Windows:
-1. they are stored (hidden) under `%APPDATA%\Adobe\CoreSync\plugins\livetype\r`
-2. the file names are some sort of ID, which is good for Adobe managing the files, yet not human-readable
+## Getting Started
 
-### Solution  
-This script **copies all activated font files to a new directory `Adobe Fonts`** on your Desktop
-and renames all of them to their PostScript name. For example, the file `17969` becomes `MinionPro-BoldCnItCapt.otf` (which includes all cues for font variation, weight, etc.).
+```bash
+npm install
+npx expo start
+```
 
-After that, you can install the fonts to the Windows font store like all other fonts by right-clicking on the file(s)
-and selecting `Install` or `Install for all users`. The fonts are then available to all your Windows applications.
+Scan the QR code in Expo Go, or press `w` for the web browser version.
 
-### Requirements
-To extract the PostScript name from the font files, `otfinfo.exe` is needed - it is part of (La)TeX distributions
-like [texLive][1] or [MikTex][2] and can also be compiled from [sources][3].
-This repository contains the binary from the MikTex for Windows distribution.
+## Features
 
-### Configuration
-The source and destination directory can be configured at the top of the script,
-even though this shouldn't really be needed as the path to the Desktop folder is auto-determined from the 
-user's environment and the Adobe CC fonts directory is located under a standard path in the user's %APPDATA%.
+- **At-bat simulation engine** — K%, BB%, HR% driven by 6+ interacting attributes (velocity, movement, control, contact, eye, power) with count pressure, fatigue curves, and L/R splits
+- **In-game decisions** — Tired starter? Bunt? Hit-and-run? Interactive scenario prompts mid-game
+- **Recruiting + NIL** — Scout pool, transfer portal, NIL budget management
+- **Full CWS bracket** — Conference Tournament → Regionals → Super Regionals → Omaha
+- **Player Career mode** — Play as a player, earn training points, transition to coaching
+- **Coaching staff perks** — Level up your staff to unlock attribute bonuses
+- **60+ real D1 programs** — Authentic colors, conferences, prestige ratings
+- **Fully offline** — No account or internet needed, saves locally
 
-### Kudos
-This script is essentially a PowerShell port of [kalaschik/adobe-fonts-revealer][4] - Grüße und Danke nach Leipzig!
+## Stack
 
-
-[1]: https://tug.org/texlive/windows.html
-[2]: https://miktex.org
-[3]: https://github.com/kohler/lcdf-typetools
-[4]: https://github.com/kalaschnik/adobe-fonts-revealer
+| | |
+|---|---|
+| Framework | React Native + Expo (managed) |
+| Navigation | Expo Router |
+| State | Zustand + AsyncStorage |
+| UI | NativeWind (Tailwind) |
+| Language | TypeScript |
